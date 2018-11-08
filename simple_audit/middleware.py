@@ -1,8 +1,11 @@
 # threadlocals middleware
+from django.utils.deprecation import MiddlewareMixin
+
 from .models import AuditRequest
 from . import settings
 
-class TrackingRequestOnThreadLocalMiddleware(object):
+
+class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):
     """Middleware that gets various objects from the
     request object and saves them in thread local storage."""
 

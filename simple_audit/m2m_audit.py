@@ -6,6 +6,7 @@ from pprint import pprint
 
 LOG = logging.getLogger(__name__)
 
+
 def ValuesQuerySetToDict(vqs):
     """converts a ValuesQuerySet to Dict"""
     return [item for item in vqs]
@@ -18,16 +19,16 @@ def get_m2m_fields_for(instance=None):
     https://docs.djangoproject.com/en/1.9/ref/models/meta/#migrating-from-the-old-api
     for migrating to the new API. This is similar to get_m2m_with_model
     except only includes field in the list and not their models. """
-    return [f for f in instance._meta.get_fields()
-        if f.many_to_many and not f.auto_created]
+    return [f for f in instance._meta.get_fields() if f.many_to_many and not f.auto_created]
 
 
 def get_m2m_values_for(instance=None):
     values = {}
     for m2m_field in get_m2m_fields_for(instance=instance):
-        values[m2m_field.verbose_name] = ValuesQuerySetToDict(m2m_field._get_val_from_obj(instance).values())
+        values[m2m_field.verbose_name] = ValuesQuerySetToDict(getattr(instance, m2m_field.attname).values())
 
     return copy.deepcopy(values)
+
 
 def normalize_dict(d):
     """removes datetime objects and passwords"""
@@ -84,6 +85,7 @@ def m2m_proccess_diff_states(old, new):
 
     return diff
 
+
 def m2m_clean_unchanged_fields(dict_diff):
     """
     returns a list of dicts with only the changes
@@ -103,17 +105,18 @@ def m2m_clean_unchanged_fields(dict_diff):
 
     return dict_list
 
+
 def m2m_dict_diff(old, new):
 
-    #old is empty?
+    # old is empty?
     swap = False
     if not old:
-        #set old to new, then swap elements at the end
+        # set old to new, then swap elements at the end
         old = new
         new = {}
         swap = True
 
-    #first create empty diff based in old state
+    # first create empty diff based in old state
     field_name = None
     diff_old = {}
     diff_new = {}
@@ -160,6 +163,7 @@ def m2m_dict_diff(old, new):
         LOG.debug("m2m diff cleaned: %s" % pprint(diff))
 
     return diff
+
 
 def persist_m2m_audit():
     pass

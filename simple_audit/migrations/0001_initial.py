@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('field', models.CharField(max_length=255)),
                 ('old_value', models.TextField(null=True, blank=True)),
                 ('new_value', models.TextField(null=True, blank=True)),
-                ('audit', models.ForeignKey(related_name='field_changes', to='simple_audit.Audit')),
+                ('audit', models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='field_changes', to='simple_audit.Audit')),
             ],
             options={
                 'db_table': 'audit_change',
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('ip', models.IPAddressField()),
                 ('path', models.CharField(max_length=1024)),
                 ('date', models.DateTimeField(auto_now_add=True, verbose_name='Date')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'db_table': 'audit_request',
@@ -63,11 +63,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='audit',
             name='audit_request',
-            field=models.ForeignKey(to='simple_audit.AuditRequest', null=True),
+            field=models.ForeignKey(on_delete=models.deletion.SET_NULL, to='simple_audit.AuditRequest', null=True),
         ),
         migrations.AddField(
             model_name='audit',
             name='content_type',
-            field=models.ForeignKey(to='contenttypes.ContentType'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='contenttypes.ContentType'),
         ),
     ]

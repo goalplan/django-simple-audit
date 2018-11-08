@@ -47,7 +47,7 @@ class VirtualMachine(models.Model):
 
     name = models.CharField(max_length=50, blank=False)
     cpus = models.IntegerField()
-    owner = models.ForeignKey(Owner)
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     so = models.CharField(max_length=100, blank=False)
     started = models.BooleanField()
 
