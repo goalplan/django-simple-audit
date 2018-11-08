@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-import logging
+
 import copy
+import logging
 from pprint import pprint
 
 LOG = logging.getLogger(__name__)

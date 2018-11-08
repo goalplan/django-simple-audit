@@ -5,12 +5,13 @@ import threading
 import uuid
 
 from django.conf import settings
-from django.db import models
-from .managers import AuditManager
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
+
+from .managers import AuditManager
 
 LOG = logging.getLogger(__name__)
 
@@ -24,8 +25,11 @@ class CustomAppName(str):
     def title(self):
         return self._title
 
-    __copy__ = lambda self: self
-    __deepcopy__ = lambda self, memodict: self
+    def  __copy__(self):
+        return self
+
+    def __deepcopy__(self, memodict={}):
+        return self
 
 
 @python_2_unicode_compatible
@@ -71,7 +75,7 @@ class Audit(models.Model):
         return audit
 
     def __str__(self):
-        return "%s" % (self.operation)
+        return u"{}".format(self.operation)
 
 
 class AuditChange(models.Model):

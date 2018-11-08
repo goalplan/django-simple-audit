@@ -1,13 +1,14 @@
 # -*- coding:utf-8 -*_
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.conf.urls import url
+from django.utils.translation import ugettext_lazy as _
+
 from .models import Audit
 from .signal import MODEL_LIST
 

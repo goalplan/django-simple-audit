@@ -1,5 +1,6 @@
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 STATUS_PROD = 'Development Status :: 5 - Production/Stable'
 STATUS_BETA = 'Development Status :: 4 - Beta'

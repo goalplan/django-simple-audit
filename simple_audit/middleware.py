@@ -1,8 +1,8 @@
 # threadlocals middleware
 from django.utils.deprecation import MiddlewareMixin
 
-from .models import AuditRequest
 from . import settings
+from .models import AuditRequest
 
 
 class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):

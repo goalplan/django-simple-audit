@@ -1,10 +1,10 @@
 # Django settings for test_project project.
+import os
+import sys
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-import sys
-import os
 sys.path.insert(0, "..")
 
 ADMINS = (
