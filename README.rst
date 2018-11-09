@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/mgaby25/django-simple-audit.svg?branch=master)](https://travis-ci.org/mgaby25/django-simple-audit)
+.. image:: https://travis-ci.org/mgaby25/django-simple-audit.svg?branch=master
+    :target: https://travis-ci.org/mgaby25/django-simple-audit
 
 ****************************************
 django simple audit
