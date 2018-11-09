@@ -20,14 +20,14 @@ class ContentTypeListFilter(SimpleListFilter):
     parameter_name = 'content_type__id__exact'
 
     def lookups(self, request, model_admin):
-            """
-            Returns a list of tuples. The first element in each
-            tuple is the coded value for the option that will
-            appear in the URL query. The second element is the
-            human-readable name for the option that will appear
-            in the right sidebar.
-            """
-            return [(ct.pk, ct.name) for ct in ContentType.objects.get_for_models(*MODEL_LIST).values()]
+        """
+        Returns a list of tuples. The first element in each
+        tuple is the coded value for the option that will
+        appear in the URL query. The second element is the
+        human-readable name for the option that will appear
+        in the right sidebar.
+        """
+        return [(ct.pk, ct.name) for ct in ContentType.objects.get_for_models(*MODEL_LIST).values()]
 
     def queryset(self, request, queryset):
         """
@@ -43,7 +43,7 @@ class ContentTypeListFilter(SimpleListFilter):
 
 class AuditAdmin(admin.ModelAdmin):
     search_fields = ("description", "audit_request__request_id", "obj_description", "object_id")
-    list_display = ("format_date", "audit_content", "operation", "audit_user", "audit_description", )
+    list_display = ("format_date", "audit_content", "operation", "audit_user", "audit_description",)
     list_filter = ("operation", ContentTypeListFilter,)
 
     def get_urls(self):
@@ -72,13 +72,14 @@ class AuditAdmin(admin.ModelAdmin):
 
     def format_date(self, obj):
         return obj.date.strftime('%d/%m/%Y %H:%M')
+
     format_date.short_description = _("Date")
     format_date.admin_order_field = 'date'
 
     def audit_description(self, audit):
         desc = "<br/>".join(escape(audit.description or "").split('\n'))
-        return desc
-    audit_description.allow_tags = True
+        return mark_safe(desc)
+
     audit_description.short_description = _("Description")
 
     def audit_content(self, audit):
@@ -94,6 +95,7 @@ class AuditAdmin(admin.ModelAdmin):
                     'obj': obj_string,
                     'id': audit.object_id}
         )
+
     audit_content.short_description = _("Current Content")
 
     def audit_user(self, audit):
@@ -105,8 +107,8 @@ class AuditAdmin(admin.ModelAdmin):
             )
         else:
             return u"%s" \
-                % (_("unknown"))
-            
+                   % (_("unknown"))
+
     audit_user.admin_order_field = "audit_request__user"
     audit_user.short_description = _("User")
 
