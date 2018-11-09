@@ -1,4 +1,4 @@
-.. image:: https://drone.io/github.com/stratasan/django-simple-audit/status.png
+[![Build Status](https://travis-ci.org/mgaby25/django-simple-audit.svg?branch=master)](https://travis-ci.org/mgaby25/django-simple-audit)
 
 ****************************************
 django simple audit
