@@ -98,7 +98,7 @@ class AuditAdmin(admin.ModelAdmin):
 
     def audit_user(self, audit):
         if audit.audit_request:
-            link = u"<a title='{title}' href='%s?user=%d'>%s</a>"
+            link = u"<a title='%s' href='%s?user=%d'>%s</a>"
             return mark_safe(
                 link % (_("Click to filter"), reverse('admin:simple_audit_audit_changelist'),
                         audit.audit_request.user.id, audit.audit_request.user)
