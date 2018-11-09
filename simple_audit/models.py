@@ -115,9 +115,9 @@ class AuditRequest(models.Model):
         """
         audit_request = AuditRequest()
         audit_request.ip = ip
-        audit_request.user = user
         audit_request.path = path
         audit_request.request_id = uuid.uuid4().hex
+        setattr(audit_request, '_user', user)
         while AuditRequest.objects.filter(request_id=audit_request.request_id).exists():
             audit_request.request_id = uuid.uuid4().hex
 
@@ -144,6 +144,7 @@ class AuditRequest(models.Model):
         """
         audit_request = getattr(AuditRequest.THREAD_LOCAL, 'current', None)
         if force_save and audit_request is not None and audit_request.pk is None:
+            audit_request.user = getattr(audit_request, '_user')
             audit_request.save()
         return audit_request
 
