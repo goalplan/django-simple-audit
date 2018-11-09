@@ -49,7 +49,9 @@ class AuditAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(AuditAdmin, self).get_urls()
         my_urls = [
-            url(r'^revert/(?P<audit_id>\d+)/$', self.admin_site.admin_view(self.revert_change), name='simple_audit_audit_revert')
+            url(r'^revert/(?P<audit_id>\d+)/$',
+                self.admin_site.admin_view(self.revert_change),
+                name='simple_audit_audit_revert')
         ]
         return my_urls + urls
 
@@ -80,24 +82,26 @@ class AuditAdmin(admin.ModelAdmin):
     audit_description.short_description = _("Description")
 
     def audit_content(self, audit):
-        obj_string = audit.obj_description or unicode(audit.content_object)
-
+        obj_string = audit.obj_description or str(audit.content_object)
+        link = "<a title='%(filter)s' href='%(base)s?content_type__id__exact=%(type_id)s&object_id__exact=%(id)s'>" \
+               "%(type)s: %(obj)s" \
+               "</a>"
         return mark_safe(
-            "<a title='%(filter)s' href='%(base)s?content_type__id__exact=%(type_id)s&object_id__exact=%(id)s'>%(type)s: %(obj)s</a>" % {
-            'filter': _("Click to filter"),
-            'base': reverse('admin:simple_audit_audit_changelist'),
-            'type': audit.content_type,
-            'type_id': audit.content_type.id,
-            'obj': obj_string,
-            'id': audit.object_id}
+            link % {'filter': _("Click to filter"),
+                    'base': reverse('admin:simple_audit_audit_changelist'),
+                    'type': audit.content_type,
+                    'type_id': audit.content_type.id,
+                    'obj': obj_string,
+                    'id': audit.object_id}
         )
     audit_content.short_description = _("Current Content")
 
     def audit_user(self, audit):
         if audit.audit_request:
+            link = u"<a title='{title}' href='%s?user=%d'>%s</a>"
             return mark_safe(
-                u"<a title='%s' href='%s?user=%d'>%s</a>"
-                % (_("Click to filter"), reverse('admin:simple_audit_audit_changelist'), audit.audit_request.user.id, audit.audit_request.user)
+                link % (_("Click to filter"), reverse('admin:simple_audit_audit_changelist'),
+                        audit.audit_request.user.id, audit.audit_request.user)
             )
         else:
             return u"%s" \

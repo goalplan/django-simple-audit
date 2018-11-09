@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date', models.DateTimeField(auto_now_add=True, verbose_name='Date')),
                 ('operation', models.PositiveIntegerField(max_length=255, verbose_name='Operation', choices=[(0, 'add'), (1, 'change'), (2, 'delete')])),
-                ('object_id', models.UUIDField(db_index=True, default=uuid.UUID('e717764a-0dcf-4134-bb1f-f518dc9be69c'))),
+                ('object_id', models.UUIDField(db_index=True, default=uuid.uuid4)),
                 ('description', models.TextField()),
                 ('obj_description', models.CharField(db_index=True, max_length=100, null=True, blank=True)),
             ],
