@@ -21,7 +21,7 @@ class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):
         return ip
 
     def process_request(self, request):
-        if not request.user.is_anonymous():
+        if not request.user.is_anonymous:
             ip = self._get_ip(request)
             AuditRequest.new_request(request.get_full_path(), request.user, ip)
         else:
