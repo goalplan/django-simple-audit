@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/mgaby25/django-simple-audit.svg?branch=master
-    :target: https://travis-ci.org/mgaby25/django-simple-audit
+.. image:: https://travis-ci.org/goalplan/django-simple-audit.svg?branch=master
+    :target: https://travis-ci.org/goalplan/django-simple-audit
 
 ****************************************
 django simple audit
