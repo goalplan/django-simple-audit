@@ -1,8 +1,16 @@
 # threadlocals middleware
-from .models import AuditRequest
-from . import settings
+from django.utils.deprecation import MiddlewareMixin
+from django.utils.functional import SimpleLazyObject
 
-class TrackingRequestOnThreadLocalMiddleware(object):
+from .models import AuditRequest
+
+
+def get_actual_user(request):
+    if request.user.is_authenticated:
+        return request.user
+
+
+class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):
     """Middleware that gets various objects from the
     request object and saves them in thread local storage."""
 
@@ -18,17 +26,12 @@ class TrackingRequestOnThreadLocalMiddleware(object):
         return ip
 
     def process_request(self, request):
-        if not request.user.is_anonymous():
-            ip = self._get_ip(request)
-            AuditRequest.new_request(request.get_full_path(), request.user, ip)
+        ip = self._get_ip(request)
+        if request.user.is_authenticated:
+            user = request.user
         else:
-            if settings.DJANGO_SIMPLE_AUDIT_REST_FRAMEWORK_AUTHENTICATOR:
-                user_auth_tuple = settings.DJANGO_SIMPLE_AUDIT_REST_FRAMEWORK_AUTHENTICATOR().authenticate(request)
-
-                if user_auth_tuple is not None:
-                    user, token = user_auth_tuple
-                    ip = self._get_ip(request)
-                    AuditRequest.new_request(request.get_full_path(), user, ip)
+            user = SimpleLazyObject(lambda: get_actual_user(request))
+        AuditRequest.new_request(request.get_full_path(), user, ip)
 
     def process_response(self, request, response):
         AuditRequest.cleanup_request()

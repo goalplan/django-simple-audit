@@ -5,12 +5,13 @@ import threading
 import uuid
 
 from django.conf import settings
-from django.db import models
-from .managers import AuditManager
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
+
+from .managers import AuditManager
 
 LOG = logging.getLogger(__name__)
 
@@ -24,8 +25,11 @@ class CustomAppName(str):
     def title(self):
         return self._title
 
-    __copy__ = lambda self: self
-    __deepcopy__ = lambda self, memodict: self
+    def __copy__(self):
+        return self
+
+    def __deepcopy__(self, memodict={}):
+        return self
 
 
 @python_2_unicode_compatible
@@ -40,10 +44,10 @@ class Audit(models.Model):
     )
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Date"))
     operation = models.PositiveIntegerField(choices=OPERATION_CHOICES, verbose_name=_('Operation'))
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField(db_index=True)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.UUIDField(db_index=True, default=uuid.uuid4)
     content_object = GenericForeignKey('content_type', 'object_id')
-    audit_request = models.ForeignKey("AuditRequest", null=True)
+    audit_request = models.ForeignKey("AuditRequest", null=True, on_delete=models.SET_NULL)
     description = models.TextField()
     obj_description = models.CharField(max_length=100, db_index=True, null=True, blank=True)
 
@@ -71,11 +75,11 @@ class Audit(models.Model):
         return audit
 
     def __str__(self):
-        return "%s" % (self.operation)
+        return u"{}".format(self.operation)
 
 
 class AuditChange(models.Model):
-    audit = models.ForeignKey(Audit, related_name='field_changes')
+    audit = models.ForeignKey(Audit, related_name='field_changes', on_delete=models.CASCADE)
     field = models.CharField(max_length=255)
     old_value = models.TextField(null=True, blank=True)
     new_value = models.TextField(null=True, blank=True)
@@ -95,7 +99,7 @@ class AuditRequest(models.Model):
     ip = models.GenericIPAddressField()
     path = models.CharField(max_length=1024)
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Date"))
-    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'))
+    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'audit_request'
@@ -111,9 +115,9 @@ class AuditRequest(models.Model):
         """
         audit_request = AuditRequest()
         audit_request.ip = ip
-        audit_request.user = user
         audit_request.path = path
         audit_request.request_id = uuid.uuid4().hex
+        setattr(audit_request, '_user', user)
         while AuditRequest.objects.filter(request_id=audit_request.request_id).exists():
             audit_request.request_id = uuid.uuid4().hex
 
@@ -140,6 +144,7 @@ class AuditRequest(models.Model):
         """
         audit_request = getattr(AuditRequest.THREAD_LOCAL, 'current', None)
         if force_save and audit_request is not None and audit_request.pk is None:
+            audit_request.user = getattr(audit_request, '_user')
             audit_request.save()
         return audit_request
 

@@ -20,4 +20,3 @@ class SimpleAppConfig(AppConfig):
 
         # Register with simple_audit
         success = register(Message, Owner, VirtualMachine, User, Pizza, Topping)
-

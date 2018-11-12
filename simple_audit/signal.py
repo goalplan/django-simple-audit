@@ -7,7 +7,6 @@ import threading
 from pprint import pprint
 
 import six
-
 from django import VERSION as DJANGO_VERSION
 from django.core.cache import cache
 from django.db import models
@@ -15,7 +14,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import m2m_audit, settings
 from .models import Audit, AuditChange
-
 
 MODEL_LIST = set()
 LOG = logging.getLogger(__name__)
@@ -31,7 +29,6 @@ def audit_m2m_change(sender, **kwargs):
     audit m2m changes if the settings DJANGO_SIMPLE_AUDIT_M2M_FIELDS is set to True
     """
     if kwargs.get('action'):
-        action = kwargs.get('action')
         instance = kwargs.get('instance')
         if kwargs['action'] == "pre_add":
             pass
@@ -39,7 +36,7 @@ def audit_m2m_change(sender, **kwargs):
             cache_key = get_cache_key_for_instance(instance)
             dict_ = cache.get(cache_key)
             if not dict_:
-                dict_ = {"old_state" : {}, "new_state": {}}
+                dict_ = {"old_state": {}, "new_state": {}}
 
             dict_["new_state"] = m2m_audit.get_m2m_values_for(instance=instance)
             dict_["m2m_change"] = True
@@ -61,8 +58,8 @@ def audit_post_save(sender, **kwargs):
 
 
 def audit_pre_save(sender, **kwargs):
-    instance=kwargs.get('instance')
-    if instance.pk and not kwargs.get('raw', False):
+    instance = kwargs.get('instance')
+    if instance._state.adding is not True and not kwargs.get('raw', False):
         if settings.DJANGO_SIMPLE_AUDIT_M2M_FIELDS:
             if m2m_audit.get_m2m_fields_for(instance): #has m2m fields?
                 cache_key = get_cache_key_for_instance(instance)
@@ -174,7 +171,7 @@ def format_value(v):
     return six.text_type(v)
 
 
-def save_audit(instance, operation, kwargs={}):
+def save_audit(instance, operation, kwargs=None):
     """
     Saves the audit.
     However, the variable persist_audit controls if the audit should be really
@@ -186,6 +183,7 @@ def save_audit(instance, operation, kwargs={}):
     operation -- operation type (add, change, delete)
     kwargs -- kwargs dict sent from m2m signal
     """
+    kwargs = kwargs or {}
 
     m2m_change = kwargs.get('m2m_change', False)
 

@@ -1,11 +1,12 @@
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 STATUS_PROD = 'Development Status :: 5 - Production/Stable'
 STATUS_BETA = 'Development Status :: 4 - Beta'
 STATUS_ALPHA = 'Development Status :: 3 - Alpha'
 
-version = '0.2.1'
+version = '0.5'
 README = os.path.join(os.path.dirname(__file__), 'README.rst')
 long_description = open(README).read()
 setup(

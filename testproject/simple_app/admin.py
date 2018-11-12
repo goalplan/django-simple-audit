@@ -1,14 +1,17 @@
 # coding: utf-8
-from .models import Message, Owner, VirtualMachine, Pizza, Topping
 from django.contrib import admin
+
+from .models import Message, Owner, Pizza, Topping, VirtualMachine
 
 
 class PizzaAdmin(admin.ModelAdmin):
     list_display = ('name',)
     filter_horizontal = ('toppings',)
-    
+
+
 class ToppingAdmin(admin.ModelAdmin):
     list_display = ('name', )
+
 
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('title', 'text')

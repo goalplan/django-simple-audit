@@ -1,4 +1,5 @@
 from django import template
+
 from simple_audit.models import Audit
 
 register = template.Library()

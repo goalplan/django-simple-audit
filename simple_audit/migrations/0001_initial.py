@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
+import uuid
+
 from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -19,7 +21,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('date', models.DateTimeField(auto_now_add=True, verbose_name='Date')),
                 ('operation', models.PositiveIntegerField(max_length=255, verbose_name='Operation', choices=[(0, 'add'), (1, 'change'), (2, 'delete')])),
-                ('object_id', models.PositiveIntegerField()),
+                ('object_id', models.UUIDField(db_index=True, default=uuid.uuid4)),
                 ('description', models.TextField()),
                 ('obj_description', models.CharField(db_index=True, max_length=100, null=True, blank=True)),
             ],
@@ -36,7 +38,7 @@ class Migration(migrations.Migration):
                 ('field', models.CharField(max_length=255)),
                 ('old_value', models.TextField(null=True, blank=True)),
                 ('new_value', models.TextField(null=True, blank=True)),
-                ('audit', models.ForeignKey(related_name='field_changes', to='simple_audit.Audit')),
+                ('audit', models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='field_changes', to='simple_audit.Audit')),
             ],
             options={
                 'db_table': 'audit_change',
@@ -52,7 +54,7 @@ class Migration(migrations.Migration):
                 ('ip', models.IPAddressField()),
                 ('path', models.CharField(max_length=1024)),
                 ('date', models.DateTimeField(auto_now_add=True, verbose_name='Date')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'db_table': 'audit_request',
@@ -63,11 +65,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='audit',
             name='audit_request',
-            field=models.ForeignKey(to='simple_audit.AuditRequest', null=True),
+            field=models.ForeignKey(on_delete=models.deletion.SET_NULL, to='simple_audit.AuditRequest', null=True),
         ),
         migrations.AddField(
             model_name='audit',
             name='content_type',
-            field=models.ForeignKey(to='contenttypes.ContentType'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='contenttypes.ContentType'),
         ),
     ]

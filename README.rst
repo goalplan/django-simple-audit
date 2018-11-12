@@ -1,4 +1,5 @@
-.. image:: https://drone.io/github.com/stratasan/django-simple-audit/status.png
+.. image:: https://travis-ci.org/mgaby25/django-simple-audit.svg?branch=master
+    :target: https://travis-ci.org/mgaby25/django-simple-audit
 
 ****************************************
 django simple audit
@@ -123,6 +124,8 @@ TODO
 
 CHANGELOG
 =========
+* 0.5
+    * Update with compatibility for Django 2.x
 * 0.4
     * Update with compatibility for Django 1.11 and Python 3
 * 0.3
