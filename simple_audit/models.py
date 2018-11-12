@@ -45,7 +45,7 @@ class Audit(models.Model):
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Date"))
     operation = models.PositiveIntegerField(choices=OPERATION_CHOICES, verbose_name=_('Operation'))
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.UUIDField(db_index=True, default=uuid.uuid4())
+    object_id = models.UUIDField(db_index=True, default=uuid.uuid4)
     content_object = GenericForeignKey('content_type', 'object_id')
     audit_request = models.ForeignKey("AuditRequest", null=True, on_delete=models.SET_NULL)
     description = models.TextField()
