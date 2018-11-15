@@ -27,10 +27,7 @@ class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         ip = self._get_ip(request)
-        if request.user.is_authenticated:
-            user = request.user
-        else:
-            user = SimpleLazyObject(lambda: get_actual_user(request))
+        user = SimpleLazyObject(lambda: get_actual_user(request))
         AuditRequest.new_request(request.get_full_path(), user, ip)
 
     def process_response(self, request, response):
