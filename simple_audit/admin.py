@@ -1,15 +1,13 @@
 # -*- coding:utf-8 -*_
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Audit
+from .models import Audit, AuditChange
 from .signal import MODEL_LIST
 
 
@@ -41,45 +39,57 @@ class ContentTypeListFilter(SimpleListFilter):
             return queryset
 
 
+class AuditChangeInline(admin.TabularInline):
+    model = AuditChange
+    readonly_fields = ('field', 'old_value', 'new_value')
+    extra = 0
+    verbose_name_plural = 'Fields were changed'
+    verbose_name = 'Field was changed'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class AuditAdmin(admin.ModelAdmin):
     search_fields = ("description", "audit_request__request_id", "obj_description", "object_id")
-    list_display = ("format_date", "audit_content", "operation", "audit_user", "audit_description",)
+    list_display = ("date", "audit_content", "operation", "audit_user", "audit_description",)
     list_filter = ("operation", ContentTypeListFilter,)
+    readonly_fields = (
+        'content_type', 'operation', 'description', 'get_audit_request_date', 'get_audit_request_username',
+        'get_audit_request_ip', 'get_audit_request_path'
+    )
+    date_hierarchy = 'date'
+    inlines = [AuditChangeInline]
 
-    def get_urls(self):
-        urls = super(AuditAdmin, self).get_urls()
-        my_urls = [
-            url(r'^revert/(?P<audit_id>\d+)/$',
-                self.admin_site.admin_view(self.revert_change),
-                name='simple_audit_audit_revert')
-        ]
-        return my_urls + urls
+    fieldsets = (
+        ('Object info', {'fields': ('operation', 'description')}),
+        ('Request info', {'fields': (
+            'get_audit_request_date', 'get_audit_request_username', 'get_audit_request_ip', 'get_audit_request_path'
+        )})
+    )
 
-    def revert_change(self, request, audit_id):
-        audit = Audit.objects.get(pk=audit_id)
-        if audit.operation == Audit.CHANGE:
-            audit_obj = audit.content_object
-            for change in audit.field_changes.all():
-                setattr(audit_obj, change.field, change.old_value)
-            audit_obj.save(force_insert=False)
-        elif audit.operation == Audit.DELETE:
-            audit_obj = audit.content_type.model_class()(pk=audit.object_id)
-            for change in audit.field_changes.all():
-                setattr(audit_obj, change.field, change.new_value)
-            audit_obj.save(force_insert=True)
+    def get_audit_request_date(self, obj):
+        return obj.audit_request.date
+    get_audit_request_date.short_description = "Date"
 
-        return redirect('admin:simple_audit_audit_changelist')
+    def get_audit_request_username(self, obj):
+        return obj.audit_request.user.username
+    get_audit_request_username.short_description = "Username"
 
-    def format_date(self, obj):
-        return obj.date.strftime('%d/%m/%Y %H:%M')
+    def get_audit_request_ip(self, obj):
+        return obj.audit_request.ip
+    get_audit_request_ip.short_description = "IP"
 
-    format_date.short_description = _("Date")
-    format_date.admin_order_field = 'date'
+    def get_audit_request_path(self, obj):
+        return obj.audit_request.path
+    get_audit_request_path.short_description = "Path"
 
     def audit_description(self, audit):
         desc = "<br/>".join(escape(audit.description or "").split('\n'))
         return mark_safe(desc)
-
     audit_description.short_description = _("Description")
 
     def audit_content(self, audit):
@@ -122,6 +132,15 @@ class AuditAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save'] = False
+        return super().changeform_view(request, object_id, extra_context=extra_context)
 
 
 admin.site.register(Audit, AuditAdmin)

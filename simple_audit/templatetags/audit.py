@@ -1,4 +1,5 @@
 from django import template
+from django.contrib.contenttypes.models import ContentType
 
 from simple_audit.models import Audit
 
@@ -56,3 +57,8 @@ def short_description(value, size):
 def changed_filter(value, size):
     new_field = ''.join(value.split()[-1:])
     return ' '.join(value.split()[:size]).rstrip(':') + ' changed to ' + new_field
+
+
+@register.simple_tag
+def get_content_type_id(obj):
+    return ContentType.objects.get_for_model(obj).id
