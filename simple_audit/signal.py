@@ -254,8 +254,8 @@ def save_audit(instance, operation, kwargs=None):
                         change = AuditChange()
                         change.audit = audit
                         change.field = field
-                        change.new_value = handle_unicode(new_value)
-                        change.old_value = handle_unicode(old_value)
+                        change.new_value = new_value
+                        change.old_value = old_value
                         change.save()
             else:
                 audit = Audit.register(instance, description, operation)
@@ -264,8 +264,8 @@ def save_audit(instance, operation, kwargs=None):
                     change = AuditChange()
                     change.audit = audit
                     change.field = field
-                    change.new_value = handle_unicode(new_value)
-                    change.old_value = handle_unicode(old_value)
+                    change.new_value = new_value
+                    change.old_value = old_value
                     change.save()
     except:
         LOG.error(u'Error registering auditing to %s: (%s) %s',
