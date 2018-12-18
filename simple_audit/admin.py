@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*_
+from __future__ import absolute_import
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
@@ -78,7 +79,7 @@ class AuditAdmin(admin.ModelAdmin):
     audit_description.short_description = _("Description")
 
     def audit_content(self, audit):
-        obj_string = audit.obj_description or unicode(audit.content_object)
+        obj_string = audit.obj_description or str(audit.content_object)
 
         return "<a title='%(filter)s' href='%(base)s?content_type__id__exact=%(type_id)s&object_id__exact=%(id)s'>%(type)s: %(obj)s</a>" % {
             'filter': _("Click to filter"),
