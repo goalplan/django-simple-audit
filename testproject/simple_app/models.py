@@ -10,6 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 class Topping(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, blank=False, unique=True)
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name

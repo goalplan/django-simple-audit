@@ -251,3 +251,33 @@ class SimpleTest(TestCase):
 
         diff = m2m_audit.m2m_dict_diff(old_state, new_state)
         self.assertEqual(diff, expected_response)
+
+    def test_field_changes_for_nullable_values(self):
+        """tests add a topping with none description"""
+        topping = Topping.objects.create(name="jalapeno")
+
+        last_audit = Audit.objects.filter(content_type=self.content_type_topping,
+                                          object_id=topping.pk).order_by('-date').first()
+
+        # description have not change because it is still None
+        assert not last_audit.field_changes.filter(field='description').exists()
+
+        topping.description = 'Some description'
+        topping.save()
+
+        last_audit = Audit.objects.filter(content_type=self.content_type_topping,
+                                          object_id=topping.pk).order_by('-date').first()
+
+        field_change = last_audit.field_changes.get(field='description')
+        assert field_change.old_value is None
+        assert field_change.new_value == 'Some description'
+
+        topping.description = None
+        topping.save()
+
+        last_audit = Audit.objects.filter(content_type=self.content_type_topping,
+                                          object_id=topping.pk).order_by('-date').first()
+
+        field_change = last_audit.field_changes.get(field='description')
+        assert field_change.old_value == 'Some description'
+        assert field_change.new_value is None
