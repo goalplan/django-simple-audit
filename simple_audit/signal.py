@@ -115,10 +115,13 @@ def get_value(obj, attr):
     Returns the value of an attribute. First it tries to return the unicode value.
     """
     if hasattr(obj, attr):
+        value = getattr(obj, attr)
+        if value is None:
+            return None
+
         try:
-            return six.text_type(getattr(obj, attr))
+            return six.text_type(value)
         except:
-            value = getattr(obj, attr)
             if hasattr(value, 'all'):
                 return [six.text_type(v) for v in value.all()]
             else:
