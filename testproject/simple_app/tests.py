@@ -8,13 +8,12 @@ Replace this with more appropriate tests for your application.
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from simple_audit import m2m_audit
 from simple_audit import settings as audit_settings
 from simple_audit.models import Audit
 
-from .models import Pizza, Topping
+from .models import Pizza, Topping, Owner, VirtualMachine
 
 
 class SimpleTest(TestCase):
@@ -25,6 +24,7 @@ class SimpleTest(TestCase):
 
         self.content_type_topping = ContentType.objects.get_for_model(Topping)
         self.content_type_pizza = ContentType.objects.get_for_model(Pizza)
+        self.content_type_virtual_machine = ContentType.objects.get_for_model(VirtualMachine)
 
     @staticmethod
     def sort_dict_collection(list_):
@@ -281,3 +281,15 @@ class SimpleTest(TestCase):
         field_change = last_audit.field_changes.get(field='description')
         assert field_change.old_value == 'Some description'
         assert field_change.new_value is None
+
+    def test_field_changes_for_foreign_key_values(self):
+        """tests field changes for foreign key value"""
+        owner = Owner.objects.create(name='Ionel')
+        vm = VirtualMachine.objects.create(name='VM1', cpus=4, owner=owner, started=True)
+
+        last_audit = Audit.objects.filter(content_type=self.content_type_virtual_machine,
+                                          object_id=vm.pk).order_by('-date').first()
+
+        field_change = last_audit.field_changes.get(field='owner')
+        assert field_change.old_value is None
+        assert field_change.new_value == str(owner.id)
