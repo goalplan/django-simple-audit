@@ -118,7 +118,8 @@ def get_value(obj, attr):
         value = getattr(obj, attr)
         if value is None:
             return None
-
+        if isinstance(value, models.Model):
+            value = value.pk
         try:
             return six.text_type(value)
         except:
