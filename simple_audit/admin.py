@@ -57,6 +57,7 @@ class AuditAdmin(admin.ModelAdmin):
     search_fields = ("description", "audit_request__request_id", "obj_description", "object_id")
     list_display = ("date", "audit_content", "operation", "audit_user", "audit_description",)
     list_filter = ("operation", ContentTypeListFilter,)
+    list_select_related = ('audit_request', 'audit_request__user', 'content_type')
     readonly_fields = (
         'content_type', 'operation', 'description', 'get_audit_request_date', 'get_audit_request_username',
         'get_audit_request_ip', 'get_audit_request_path'
@@ -109,7 +110,7 @@ class AuditAdmin(admin.ModelAdmin):
     audit_content.short_description = _("Current Content")
 
     def audit_user(self, audit):
-        if audit.audit_request:
+        if audit.audit_request and audit.audit_request.user:
             link = u"<a title='%s' href='%s?user=%d'>%s</a>"
             return mark_safe(
                 link % (_("Click to filter"), reverse('admin:simple_audit_audit_changelist'),

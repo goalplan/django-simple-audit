@@ -144,7 +144,9 @@ class AuditRequest(models.Model):
         """
         audit_request = getattr(AuditRequest.THREAD_LOCAL, 'current', None)
         if force_save and audit_request is not None and audit_request.pk is None:
-            audit_request.user = getattr(audit_request, '_user')
+            user = getattr(audit_request, '_user')
+            if user:
+                audit_request.user = user
             audit_request.save()
         return audit_request
 
