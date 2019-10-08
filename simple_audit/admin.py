@@ -5,7 +5,7 @@ from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import escape
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect
 from django.conf.urls import url
 from .models import Audit
@@ -15,18 +15,21 @@ from .signal import MODEL_LIST
 class ContentTypeListFilter(SimpleListFilter):
     # Human-readable title which will be displayed in the
     # right admin sidebar just above the filter options.
-    title = _('Object')
-    parameter_name = 'content_type__id__exact'
+    title = _("Object")
+    parameter_name = "content_type__id__exact"
 
     def lookups(self, request, model_admin):
-            """
+        """
             Returns a list of tuples. The first element in each
             tuple is the coded value for the option that will
             appear in the URL query. The second element is the
             human-readable name for the option that will appear
             in the right sidebar.
             """
-            return [(ct.pk, ct.name) for ct in ContentType.objects.get_for_models(*MODEL_LIST).values()]
+        return [
+            (ct.pk, ct.name)
+            for ct in ContentType.objects.get_for_models(*MODEL_LIST).values()
+        ]
 
     def queryset(self, request, queryset):
         """
@@ -41,14 +44,29 @@ class ContentTypeListFilter(SimpleListFilter):
 
 
 class AuditAdmin(admin.ModelAdmin):
-    search_fields = ("description", "audit_request__request_id", "obj_description", "object_id")
-    list_display = ("format_date", "audit_content", "operation", "audit_user", "audit_description", )
-    list_filter = ("operation", ContentTypeListFilter,)
+    search_fields = (
+        "description",
+        "audit_request__request_id",
+        "obj_description",
+        "object_id",
+    )
+    list_display = (
+        "format_date",
+        "audit_content",
+        "operation",
+        "audit_user",
+        "audit_description",
+    )
+    list_filter = ("operation", ContentTypeListFilter)
 
     def get_urls(self):
         urls = super(AuditAdmin, self).get_urls()
         my_urls = [
-            url(r'^revert/(?P<audit_id>\d+)/$', self.admin_site.admin_view(self.revert_change), name='simple_audit_audit_revert')
+            url(
+                r"^revert/(?P<audit_id>\d+)/$",
+                self.admin_site.admin_view(self.revert_change),
+                name="simple_audit_audit_revert",
+            )
         ]
         return my_urls + urls
 
@@ -65,40 +83,50 @@ class AuditAdmin(admin.ModelAdmin):
                 setattr(audit_obj, change.field, change.new_value)
             audit_obj.save(force_insert=True)
 
-        return redirect('admin:simple_audit_audit_changelist')
+        return redirect("admin:simple_audit_audit_changelist")
 
     def format_date(self, obj):
-        return obj.date.strftime('%d/%m/%Y %H:%M')
+        return obj.date.strftime("%d/%m/%Y %H:%M")
+
     format_date.short_description = _("Date")
-    format_date.admin_order_field = 'date'
+    format_date.admin_order_field = "date"
 
     def audit_description(self, audit):
-        desc = "<br/>".join(escape(audit.description or "").split('\n'))
+        desc = "<br/>".join(escape(audit.description or "").split("\n"))
         return desc
+
     audit_description.allow_tags = True
     audit_description.short_description = _("Description")
 
     def audit_content(self, audit):
         obj_string = audit.obj_description or str(audit.content_object)
 
-        return "<a title='%(filter)s' href='%(base)s?content_type__id__exact=%(type_id)s&object_id__exact=%(id)s'>%(type)s: %(obj)s</a>" % {
-            'filter': _("Click to filter"),
-            'base': reverse('admin:simple_audit_audit_changelist'),
-            'type': audit.content_type,
-            'type_id': audit.content_type.id,
-            'obj': obj_string,
-            'id': audit.object_id}
+        return (
+            "<a title='%(filter)s' href='%(base)s?content_type__id__exact=%(type_id)s&object_id__exact=%(id)s'>%(type)s: %(obj)s</a>"
+            % {
+                "filter": _("Click to filter"),
+                "base": reverse("admin:simple_audit_audit_changelist"),
+                "type": audit.content_type,
+                "type_id": audit.content_type.id,
+                "obj": obj_string,
+                "id": audit.object_id,
+            }
+        )
+
     audit_content.short_description = _("Current Content")
     audit_content.allow_tags = True
 
     def audit_user(self, audit):
         if audit.audit_request:
-            return u"<a title='%s' href='%s?user=%d'>%s</a>" \
-                % (_("Click to filter"), reverse('admin:simple_audit_audit_changelist'), audit.audit_request.user.id, audit.audit_request.user)
+            return u"<a title='%s' href='%s?user=%d'>%s</a>" % (
+                _("Click to filter"),
+                reverse("admin:simple_audit_audit_changelist"),
+                audit.audit_request.user.id,
+                audit.audit_request.user,
+            )
         else:
-            return u"%s" \
-                % (_("unknown"))
-            
+            return u"%s" % (_("unknown"))
+
     audit_user.admin_order_field = "audit_request__user"
     audit_user.short_description = _("User")
     audit_user.allow_tags = True
@@ -112,6 +140,7 @@ class AuditAdmin(admin.ModelAdmin):
         return qs
 
     def has_add_permission(self, request):
-            return False
+        return False
+
 
 admin.site.register(Audit, AuditAdmin)
