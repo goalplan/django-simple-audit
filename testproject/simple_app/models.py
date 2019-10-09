@@ -12,7 +12,7 @@ class Topping(models.Model):
 
     def __str__(self):
         return self.name
-        
+
 
 @python_2_unicode_compatible
 class Pizza(models.Model):
@@ -23,6 +23,7 @@ class Pizza(models.Model):
     def __str__(self):
         return self.name
 
+
 @python_2_unicode_compatible
 class Message(models.Model):
 
@@ -31,7 +32,7 @@ class Message(models.Model):
 
     def __str__(self):
         return self.text
-        
+
 
 @python_2_unicode_compatible
 class Owner(models.Model):
@@ -47,11 +48,10 @@ class VirtualMachine(models.Model):
 
     name = models.CharField(max_length=50, blank=False)
     cpus = models.IntegerField()
-    owner = models.ForeignKey(Owner)
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     so = models.CharField(max_length=100, blank=False)
     started = models.BooleanField()
 
     def __str__(self):
         return self.name
-
 
