@@ -54,5 +54,7 @@ class VirtualMachine(models.Model):
     so = models.CharField(max_length=100, blank=False)
     started = models.BooleanField()
 
+    EXCLUDE_FIELDS_FROM_AUDIT = ['started']
+
     def __str__(self):
         return self.name
