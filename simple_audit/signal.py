@@ -140,7 +140,10 @@ def to_dict(obj):
 
     state = {}
 
-    field_names = [f.name for f in obj._meta.get_fields()]
+    field_names = [
+        f.name for f in obj._meta.get_fields()
+        if f.name not in getattr(obj.__class__, 'EXCLUDE_FIELDS_FROM_AUDIT', [])
+    ]
 
     for key in field_names:
         state[key] = get_value(obj, key)

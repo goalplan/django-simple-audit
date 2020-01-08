@@ -293,3 +293,16 @@ class SimpleTest(TestCase):
         field_change = last_audit.field_changes.get(field='owner')
         assert field_change.old_value is None
         assert field_change.new_value == str(owner.id)
+
+    def test_field_changes_for_excluded_fields(self):
+        """tests field changes for foreign key value"""
+        owner = Owner.objects.create(name='Ionel')
+        vm = VirtualMachine.objects.create(name='VM1', cpus=4, owner=owner, started=True)
+
+        last_audit = Audit.objects.filter(content_type=self.content_type_virtual_machine,
+                                          object_id=vm.pk).order_by('-date').first()
+
+        assert last_audit.field_changes.filter(field='name').exists()
+        assert last_audit.field_changes.filter(field='cpus').exists()
+        assert last_audit.field_changes.filter(field='owner').exists()
+        assert not last_audit.field_changes.filter(field='started').exists()
