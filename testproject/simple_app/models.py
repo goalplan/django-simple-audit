@@ -2,10 +2,8 @@
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Topping(models.Model):
 
     name = models.CharField(max_length=50, blank=False, unique=True)
@@ -14,7 +12,6 @@ class Topping(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Pizza(models.Model):
 
     name = models.CharField(max_length=50, blank=False, unique=True)
@@ -24,7 +21,6 @@ class Pizza(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Message(models.Model):
 
     title = models.CharField(max_length=50, blank=False)
@@ -34,7 +30,6 @@ class Message(models.Model):
         return self.text
 
 
-@python_2_unicode_compatible
 class Owner(models.Model):
 
     name = models.CharField(max_length=50, blank=False)
@@ -43,7 +38,6 @@ class Owner(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class VirtualMachine(models.Model):
 
     name = models.CharField(max_length=50, blank=False)
