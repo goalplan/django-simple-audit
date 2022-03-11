@@ -5,16 +5,15 @@ when you run "manage.py test".
 Replace this with more appropriate tests for your application.
 """
 
-from django.test import TestCase
-from django.contrib.contenttypes.models import ContentType
-from django.test.utils import override_settings
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 
+from simple_audit import m2m_audit
+from simple_audit import settings as audit_settings
+from simple_audit.models import Audit
 from .models import Topping, Pizza
 
-from simple_audit.models import Audit
-from simple_audit import settings as audit_settings
-from simple_audit import m2m_audit
 
 class SimpleTest(TestCase):
 
