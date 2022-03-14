@@ -88,12 +88,19 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '-)$unlz65!g6js)ipe)e^h5-hao9*v)t=i9&amp;93y9j0uic(5)*f'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    # 'django.template.loaders.eggs.Loader',
-)
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "OPTIONS": {
+            "context_processors": [
+                'django.template.context_processors.request',
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+            "loaders": ['django.template.loaders.filesystem.Loader', 'django.template.loaders.app_directories.Loader', ]
+        },
+    }
+]
 
 CACHES = {
     'default': {
@@ -103,7 +110,7 @@ CACHES = {
     }
 }
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -192,3 +199,4 @@ LOGGING = {
 
 DJANGO_SIMPLE_AUDIT_ACTIVATED = True
 DJANGO_SIMPLE_AUDIT_M2M_FIELDS = True
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

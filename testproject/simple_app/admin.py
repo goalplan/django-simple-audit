@@ -6,9 +6,11 @@ from django.contrib import admin
 class PizzaAdmin(admin.ModelAdmin):
     list_display = ('name',)
     filter_horizontal = ('toppings',)
-    
+
+
 class ToppingAdmin(admin.ModelAdmin):
-    list_display = ('name', )
+    list_display = ('name',)
+
 
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('title', 'text')

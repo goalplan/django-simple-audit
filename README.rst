@@ -112,9 +112,9 @@ You need to have at least one cache backend set in your django settings, otherwi
 Dependencies
 ============
 
-* Django >= 1.8.x
+* Django >= 3.2.x
 * django.contrib.contenttypes installed in INSTALLED_APPS
-* Supports Python >= 2.7 and Python3 >= 3.6
+* Supports Python3 >= 3.6
 
 
 TODO

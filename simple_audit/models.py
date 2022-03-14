@@ -9,8 +9,7 @@ from django.db import models
 from .managers import AuditManager
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import gettext_lazy as _
 
 LOG = logging.getLogger(__name__)
 
@@ -28,7 +27,6 @@ class CustomAppName(str):
     __deepcopy__ = lambda self, memodict: self
 
 
-@python_2_unicode_compatible
 class Audit(models.Model):
     ADD = 0
     CHANGE = 1

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
 from django.urls import reverse
 from django.shortcuts import redirect
