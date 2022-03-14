@@ -2,13 +2,14 @@
 from __future__ import absolute_import, unicode_literals
 import logging
 import copy
+from django.forms.models import model_to_dict
 from pprint import pprint
 
 LOG = logging.getLogger(__name__)
 
 def ValuesQuerySetToDict(vqs):
     """converts a ValuesQuerySet to Dict"""
-    return [item for item in vqs]
+    return [model_to_dict(item) for item in vqs]
 
 
 def get_m2m_fields_for(instance=None):
