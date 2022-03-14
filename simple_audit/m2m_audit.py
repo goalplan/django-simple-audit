@@ -26,7 +26,7 @@ def get_m2m_fields_for(instance=None):
 def get_m2m_values_for(instance=None):
     values = {}
     for m2m_field in get_m2m_fields_for(instance=instance):
-        values[m2m_field.verbose_name] = ValuesQuerySetToDict(m2m_field._get_val_from_obj(instance).values())
+        values[m2m_field.verbose_name] = ValuesQuerySetToDict(m2m_field.value_from_object(instance))
 
     return copy.deepcopy(values)
 
