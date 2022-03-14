@@ -79,10 +79,10 @@ class SimpleTest(TestCase):
         # m2m audit recorded?
         # u"field toppings.1.id: was changed from None to 1\nfield toppings.1.name: was changed from None to 'calabresa'"
         desc = "field toppings.%s.id: was changed from None to %s\nfield toppings.%s.name: was changed from None to '%s'" % (
-        self.topping_onion.id,
-        self.topping_onion.id,
-        self.topping_onion.id,
-        self.topping_onion.name)
+            self.topping_onion.id,
+            self.topping_onion.id,
+            self.topping_onion.id,
+            self.topping_onion.name)
 
         self.assertTrue(Audit.objects.get(operation=1,
                                           content_type=self.content_type_pizza,
