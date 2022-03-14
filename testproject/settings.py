@@ -93,6 +93,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "OPTIONS": {
             "context_processors": [
+                'django.template.context_processors.request',
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -198,3 +199,4 @@ LOGGING = {
 
 DJANGO_SIMPLE_AUDIT_ACTIVATED = True
 DJANGO_SIMPLE_AUDIT_M2M_FIELDS = True
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
