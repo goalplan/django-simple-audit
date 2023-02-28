@@ -124,6 +124,8 @@ TODO
 
 CHANGELOG
 =========
+* 0.6
+    * Update with compatibility for Django 4.x
 * 0.5
     * Update with compatibility for Django 2.x
 * 0.4
@@ -134,7 +136,7 @@ CHANGELOG
     * Update with compatibility for Django 1.9
     * Add Migrations
 * 0.1.21
-	* Problems with upload to pypi ( the version was used ) - Sux 
+	* Problems with upload to pypi ( the version was used ) - Sux
 
 * 0.1.20
         * Add .get_queryset to AuditManager ( thanks sburns )
