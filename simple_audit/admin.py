@@ -46,7 +46,7 @@ class AuditChangeInline(admin.TabularInline):
     verbose_name_plural = 'Fields were changed'
     verbose_name = 'Field was changed'
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
     def has_delete_permission(self, request, obj=None):
@@ -131,7 +131,7 @@ class AuditAdmin(admin.ModelAdmin):
             qs = qs.filter(audit_request__user__in=user_filter)
         return qs
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
     def has_delete_permission(self, request, obj=None):
