@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import Audit, AuditChange
 from .signal import MODEL_LIST
@@ -46,7 +46,7 @@ class AuditChangeInline(admin.TabularInline):
     verbose_name_plural = 'Fields were changed'
     verbose_name = 'Field was changed'
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
     def has_delete_permission(self, request, obj=None):
@@ -131,7 +131,7 @@ class AuditAdmin(admin.ModelAdmin):
             qs = qs.filter(audit_request__user__in=user_filter)
         return qs
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
     def has_delete_permission(self, request, obj=None):

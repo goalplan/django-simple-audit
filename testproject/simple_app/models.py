@@ -1,12 +1,9 @@
 # coding: utf-8
 import uuid
 
-from django.contrib.auth.models import User
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Topping(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, blank=False, unique=True)
@@ -14,9 +11,8 @@ class Topping(models.Model):
 
     def __str__(self):
         return self.name
-        
 
-@python_2_unicode_compatible
+
 class Pizza(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, blank=False, unique=True)
@@ -26,7 +22,6 @@ class Pizza(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=50, blank=False)
@@ -34,9 +29,8 @@ class Message(models.Model):
 
     def __str__(self):
         return self.text
-        
 
-@python_2_unicode_compatible
+
 class Owner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, blank=False)
@@ -45,7 +39,6 @@ class Owner(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class VirtualMachine(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, blank=False)
