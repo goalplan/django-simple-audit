@@ -26,6 +26,8 @@ class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):
         return ip
 
     def process_request(self, request):
+        if request.method == "GET":
+            return
         ip = self._get_ip(request)
         user = SimpleLazyObject(lambda: get_actual_user(request))
         AuditRequest.new_request(request.get_full_path(), user, ip)
