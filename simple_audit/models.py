@@ -93,7 +93,7 @@ class AuditRequest(models.Model):
 
     THREAD_LOCAL = threading.local()
 
-    request_id = models.CharField(max_length=255)
+    request_id = models.CharField(max_length=255, db_index=True)
     ip = models.GenericIPAddressField()
     path = models.CharField(max_length=1024)
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Date"))
@@ -116,8 +116,6 @@ class AuditRequest(models.Model):
         audit_request.path = path
         audit_request.request_id = uuid.uuid4().hex
         setattr(audit_request, '_user', user)
-        while AuditRequest.objects.filter(request_id=audit_request.request_id).exists():
-            audit_request.request_id = uuid.uuid4().hex
 
         AuditRequest.THREAD_LOCAL.current = audit_request
         return audit_request
