@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.html import escape
 from django.urls import reverse
 from django.shortcuts import redirect
-from django.conf.urls import url
+from django.urls import path
 from .models import Audit
 from .signal import MODEL_LIST
 
@@ -43,6 +43,7 @@ class ContentTypeListFilter(SimpleListFilter):
             return queryset
 
 
+@admin.register(Audit)
 class AuditAdmin(admin.ModelAdmin):
     search_fields = (
         "description",
@@ -62,8 +63,8 @@ class AuditAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super(AuditAdmin, self).get_urls()
         my_urls = [
-            url(
-                r"^revert/(?P<audit_id>\d+)/$",
+            path(
+                "revert/<int:audit_id>/",
                 self.admin_site.admin_view(self.revert_change),
                 name="simple_audit_audit_revert",
             )
@@ -85,19 +86,25 @@ class AuditAdmin(admin.ModelAdmin):
 
         return redirect("admin:simple_audit_audit_changelist")
 
+    @admin.display(
+        description=_("Date"),
+        ordering="date",
+    )
     def format_date(self, obj):
         return obj.date.strftime("%d/%m/%Y %H:%M")
 
-    format_date.short_description = _("Date")
-    format_date.admin_order_field = "date"
 
+    @admin.display(
+        description=_("Description")
+    )
     def audit_description(self, audit):
         desc = "<br/>".join(escape(audit.description or "").split("\n"))
         return desc
 
-    audit_description.allow_tags = True
-    audit_description.short_description = _("Description")
 
+    @admin.display(
+        description=_("Current Content")
+    )
     def audit_content(self, audit):
         obj_string = audit.obj_description or str(audit.content_object)
 
@@ -113,9 +120,11 @@ class AuditAdmin(admin.ModelAdmin):
             }
         )
 
-    audit_content.short_description = _("Current Content")
-    audit_content.allow_tags = True
 
+    @admin.display(
+        description=_("User"),
+        ordering="audit_request__user",
+    )
     def audit_user(self, audit):
         if audit.audit_request:
             return u"<a title='%s' href='%s?user=%d'>%s</a>" % (
@@ -127,9 +136,6 @@ class AuditAdmin(admin.ModelAdmin):
         else:
             return u"%s" % (_("unknown"))
 
-    audit_user.admin_order_field = "audit_request__user"
-    audit_user.short_description = _("User")
-    audit_user.allow_tags = True
 
     def queryset(self, request):
         request.GET = request.GET.copy()
@@ -143,4 +149,3 @@ class AuditAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(Audit, AuditAdmin)
