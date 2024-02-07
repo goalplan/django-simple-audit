@@ -11,8 +11,8 @@ class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):
 
     def _get_ip(self, request):
         # get real ip
-        if "HTTP_X_FORWARDED_FOR" in request.META:
-            ip = request.META["HTTP_X_FORWARDED_FOR"]
+        if "x-forwarded-for" in request.headers:
+            ip = request.headers["x-forwarded-for"]
         elif "Client-IP" in request.META:
             ip = request.META["Client-IP"]
         else:
