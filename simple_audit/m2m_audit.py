@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-
 import copy
 import logging
+from django.forms.models import model_to_dict
 from pprint import pprint
 
 LOG = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ LOG = logging.getLogger(__name__)
 
 def ValuesQuerySetToDict(vqs):
     """converts a ValuesQuerySet to Dict"""
-    return [item for item in vqs]
+    return [model_to_dict(item) for item in vqs]
 
 
 def get_m2m_fields_for(instance=None):
@@ -20,13 +20,14 @@ def get_m2m_fields_for(instance=None):
     https://docs.djangoproject.com/en/1.9/ref/models/meta/#migrating-from-the-old-api
     for migrating to the new API. This is similar to get_m2m_with_model
     except only includes field in the list and not their models. """
-    return [f for f in instance._meta.get_fields() if f.many_to_many and not f.auto_created]
+    return [f for f in instance._meta.get_fields()
+            if f.many_to_many and not f.auto_created]
 
 
 def get_m2m_values_for(instance=None):
     values = {}
     for m2m_field in get_m2m_fields_for(instance=instance):
-        values[m2m_field.verbose_name] = ValuesQuerySetToDict(getattr(instance, m2m_field.attname).values())
+        values[m2m_field.verbose_name] = ValuesQuerySetToDict(m2m_field.value_from_object(instance))
 
     return copy.deepcopy(values)
 
@@ -79,7 +80,7 @@ def m2m_proccess_diff_states(old, new):
                     pass
             del new_copy[field_id]
 
-    #add remaining items in new_copy to diff
+    # add remaining items in new_copy to diff
     for field_id in new_copy.keys():
         new_ = new_copy[field_id]
         diff[field_id] = new_
@@ -108,7 +109,6 @@ def m2m_clean_unchanged_fields(dict_diff):
 
 
 def m2m_dict_diff(old, new):
-
     # old is empty?
     swap = False
     if not old:
@@ -126,13 +126,13 @@ def m2m_dict_diff(old, new):
         ###########
         # oldstate
         ##########
-        id_=0
+        id_ = 0
         for item in old[key]:
-            empty_dict={}
+            empty_dict = {}
             for key_ in item.keys():
                 if key_ == "id":
-                    id_=item[key_]
-                #when old is empty, the dicts are swapped
+                    id_ = item[key_]
+                # when old is empty, the dicts are swapped
                 if swap:
                     empty_dict[key_] = [None, item[key_]]
                 else:
@@ -143,12 +143,12 @@ def m2m_dict_diff(old, new):
         ############
         # new state
         ############
-        id_=0
+        id_ = 0
         for item in new.get(key, {}):
-            empty_dict={}
+            empty_dict = {}
             for key_ in item.keys():
                 if key_ == "id":
-                    id_=item[key_]
+                    id_ = item[key_]
                 empty_dict[key_] = [None, item[key_]]
 
             diff_new["%s.%s" % (field_name, id_)] = empty_dict

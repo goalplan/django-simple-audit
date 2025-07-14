@@ -35,19 +35,21 @@ class Audit(models.Model):
     ADD = 0
     CHANGE = 1
     DELETE = 2
-    OPERATION_CHOICES = (
-        (ADD, _('add')),
-        (CHANGE, _('change')),
-        (DELETE, _('delete'))
-    )
+    OPERATION_CHOICES = ((ADD, _("add")), (CHANGE, _("change")), (DELETE, _("delete")))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Date"))
-    operation = models.PositiveIntegerField(choices=OPERATION_CHOICES, verbose_name=_('Operation'))
+    operation = models.PositiveIntegerField(
+        choices=OPERATION_CHOICES, verbose_name=_("Operation")
+    )
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.UUIDField(db_index=True)
-    content_object = GenericForeignKey('content_type', 'object_id')
-    audit_request = models.ForeignKey("AuditRequest", null=True, on_delete=models.SET_NULL)
+    content_object = GenericForeignKey("content_type", "object_id")
+    audit_request = models.ForeignKey(
+        "AuditRequest", null=True, on_delete=models.SET_NULL
+    )
     description = models.TextField()
-    obj_description = models.CharField(max_length=100, db_index=True, null=True, blank=True)
+    obj_description = models.CharField(
+        max_length=100, db_index=True, null=True, blank=True
+    )
 
     objects = AuditManager()
 
@@ -56,10 +58,10 @@ class Audit(models.Model):
         return dict(self.OPERATION_CHOICES)[self.operation]
 
     class Meta:
-        db_table = 'audit'
-        app_label = CustomAppName('simple_audit', _('Audits'))
-        verbose_name = _('Audit')
-        verbose_name_plural = _('Audits')
+        db_table = "audit"
+        app_label = CustomAppName("simple_audit", _("Audits"))
+        verbose_name = _("Audit")
+        verbose_name_plural = _("Audits")
 
     @staticmethod
     def register(audit_obj, description, operation=None):
@@ -67,7 +69,7 @@ class Audit(models.Model):
         audit.operation = Audit.CHANGE if operation is None else operation
         audit.content_object = audit_obj
         audit.description = description
-        audit.obj_description = (audit_obj and str(audit_obj) and '')[:100]
+        audit.obj_description = (audit_obj and str(audit_obj) and "")[:100]
         audit.audit_request = AuditRequest.current_request(True)
         audit.save()
         return audit
@@ -77,16 +79,18 @@ class Audit(models.Model):
 
 
 class AuditChange(models.Model):
-    audit = models.ForeignKey(Audit, related_name='field_changes', on_delete=models.CASCADE)
+    audit = models.ForeignKey(
+        Audit, on_delete=models.CASCADE, related_name="field_changes"
+    )
     field = models.CharField(max_length=255)
     old_value = models.TextField(null=True, blank=True)
     new_value = models.TextField(null=True, blank=True)
 
     class Meta:
-        db_table = 'audit_change'
-        app_label = CustomAppName('simple_audit', _('Audits'))
-        verbose_name = _('Audit')
-        verbose_name_plural = _('Audits')
+        db_table = "audit_change"
+        app_label = CustomAppName("simple_audit", _("Audits"))
+        verbose_name = _("Audit")
+        verbose_name_plural = _("Audits")
 
 
 class AuditRequest(models.Model):
@@ -97,13 +101,17 @@ class AuditRequest(models.Model):
     ip = models.GenericIPAddressField()
     path = models.CharField(max_length=1024)
     date = models.DateTimeField(auto_now_add=True, verbose_name=_("Date"))
-    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(
+        getattr(settings, "AUTH_USER_MODEL", "auth.User"), 
+        on_delete=models.SET_NULL, 
+        null=True
+    )
 
     class Meta:
-        db_table = 'audit_request'
-        app_label = CustomAppName('simple_audit', _('Audits'))
-        verbose_name = _('Audit')
-        verbose_name_plural = _('Audits')
+        db_table = "audit_request"
+        app_label = CustomAppName("simple_audit", _("Audits"))
+        verbose_name = _("Audit")
+        verbose_name_plural = _("Audits")
 
     @staticmethod
     def new_request(path, user, ip):
@@ -138,7 +146,7 @@ class AuditRequest(models.Model):
         """ Get current request from thread context (or None doesn't exist). If you specify force_save,
         current request will be saved on database first.
         """
-        audit_request = getattr(AuditRequest.THREAD_LOCAL, 'current', None)
+        audit_request = getattr(AuditRequest.THREAD_LOCAL, "current", None)
         if force_save and audit_request is not None and audit_request.pk is None:
             user = getattr(audit_request, '_user')
             if user:
