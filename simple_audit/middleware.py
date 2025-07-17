@@ -32,20 +32,9 @@ class TrackingRequestOnThreadLocalMiddleware(MiddlewareMixin):
         if request.method == "GET":
             return
 
-        if not request.user.is_anonymous:
-            ip = self._get_ip(request)
-            user = SimpleLazyObject(lambda: get_actual_user(request))
-            AuditRequest.new_request(request.get_full_path(), user, ip)
-        else:
-            if settings.DJANGO_SIMPLE_AUDIT_REST_FRAMEWORK_AUTHENTICATOR:
-                user_auth_tuple = settings.DJANGO_SIMPLE_AUDIT_REST_FRAMEWORK_AUTHENTICATOR().authenticate(
-                    request
-                )
-
-                if user_auth_tuple is not None:
-                    user, token = user_auth_tuple
-                    ip = self._get_ip(request)
-                    AuditRequest.new_request(request.get_full_path(), user, ip)
+        ip = self._get_ip(request)
+        user = SimpleLazyObject(lambda: get_actual_user(request))
+        AuditRequest.new_request(request.get_full_path(), user, ip)
 
     def process_response(self, request, response):
         AuditRequest.cleanup_request()
